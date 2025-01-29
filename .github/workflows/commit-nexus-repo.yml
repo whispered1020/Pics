@@ -40,13 +40,10 @@ jobs:
       run: |
         if [[ -f $HOME/$DESTINATION/VERSION ]]; then
           LAST_SHA=$(cat $HOME/$DESTINATION/VERSION)
-          REMOVED=$(git diff --name-only --no-renames --diff-filter=D $LAST_SHA | c1grep -P "\.(jpg|png)$")
+          REMOVED=$(git diff --name-only --no-renames --diff-filter=D $LAST_SHA)
           if [[ "$REMOVED" ]]; then
             cd $HOME/$DESTINATION
-            echo "$REMOVED" | while IFS= read -r file; do
-              dest_file="${file%.*}.jpg"
-              git rm -rf --ignore-unmatch "$dest_file"
-            done
+            git rm -rf --ignore-unmatch $REMOVED
           fi
         fi
     - name: Commit and push with original metadata
