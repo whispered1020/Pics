@@ -5,21 +5,30 @@ from PIL import Image
 def process_image(input_path, output_dir):
     try:
         with Image.open(input_path) as img:
-            filename, ext = os.path.splitext(os.path.basename(input_path))
-            output_filename = f"{filename}.jpg"
+            filename = os.path.splitext(os.path.basename(input_path))[0]
             relative_path = os.path.relpath(input_path, start=os.getcwd())
             relative_dir = os.path.dirname(relative_path)
-            output_path = os.path.join(output_dir, relative_dir, output_filename)
-
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
-
-            if img.mode == "RGBA":
-                img = img.convert("RGB")
 
             if "field" in relative_path.lower():
+                output_filename = f"{filename}.png"
+                output_path = os.path.join(output_dir, relative_dir, output_filename)
+                
+                os.makedirs(os.path.dirname(output_path), exist_ok=True)
+                
+                if img.mode != "RGBA":
+                    img = img.convert("RGBA")
+                
                 img = img.resize((512, 512))
-                img.save(output_path, "JPEG", quality=95, optimize=True)
+                img.save(output_path, "PNG", optimize=True)
             else:
+                output_filename = f"{filename}.jpg"
+                output_path = os.path.join(output_dir, relative_dir, output_filename)
+                
+                os.makedirs(os.path.dirname(output_path), exist_ok=True)
+                
+                if img.mode == "RGBA":
+                    img = img.convert("RGB")
+                
                 img = img.resize((322, 470))
                 file_size_kb = os.path.getsize(input_path) / 1024
                 if file_size_kb <= 60:
